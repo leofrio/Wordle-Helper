@@ -13,7 +13,9 @@ function doit() {
     //indicated when the file is read
     fr.onload =function() {  
         rawWords=fr.result.split("\r\n") 
-        var r1=rawWords 
+        var r1=rawWords.map((element) => { 
+            return removeSymbol(element)
+        }) 
         //rawWords is all the words into an array
         //the below if to see if it starts with the startw 
         /* alert("globalAddedInputs: " + globalAddedInputs) 
@@ -246,4 +248,16 @@ function notBlankSlots(arr) {
             }
         } 
         return counter
+}
+
+function removeSymbol(text)
+{       
+    text = text.toLowerCase();                                                         
+    text = text.replace(new RegExp('[ÁÀÂÃ]','gi'), 'a');
+    text = text.replace(new RegExp('[ÉÈÊ]','gi'), 'e');
+    text = text.replace(new RegExp('[ÍÌÎ]','gi'), 'i');
+    text = text.replace(new RegExp('[ÓÒÔÕ]','gi'), 'o');
+    text = text.replace(new RegExp('[ÚÙÛ]','gi'), 'u');
+    text = text.replace(new RegExp('[Ç]','gi'), 'c');
+    return text;                 
 }
