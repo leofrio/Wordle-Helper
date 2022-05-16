@@ -1,5 +1,6 @@
 //thesaurus key:8456d313-a8db-44a4-aa38-ef6d1086cf28  
 var globalAddedInputs=[];
+var globalNotInputs=[];
 function doit() { 
     // just getting the main inputs
     var newfile=document.getElementById("thefile")
@@ -14,7 +15,9 @@ function doit() {
         rawWords=fr.result.split("\r\n") 
         var r1=rawWords 
         //rawWords is all the words into an array
-        //the below if to see if it starts with the startw
+        //the below if to see if it starts with the startw 
+        /* alert("globalAddedInputs: " + globalAddedInputs) 
+        alert("globalNotInputs: " + globalNotInputs) */
         if(startw != "") { 
             //the filter fuinction makes every element go through a test if they pass it will be added to r1 if not they wont
             r1=r1.filter(function(element) { 
@@ -109,6 +112,39 @@ function doit() {
                 return false;
             })
         } 
+        if(!isEmpty(globalNotInputs)) { 
+            r1=r1.filter(function(element) {
+                var i=0
+                valuesarr=[]
+                var counter=0
+                for(data of globalNotInputs) { 
+                    var current=document.getElementById(data).value    
+                    valuesarr.push(current)
+                    if(current != "") { 
+                        var letters=current.split(",")
+                        var currentpos=parseInt(data.charAt(data.length-1))  
+                        for(let i=0;i< letters.length;i++) { 
+                            if(element.charAt(currentpos) == letters[i]) { 
+                                return false 
+                            }  
+                            else {
+                                 if(i == letters.length-1) { 
+                                     counter++
+                                 }
+                            }
+                        }
+                    } 
+                    i++
+                } 
+                if(counter == notBlankSlots(valuesarr)) { 
+                    return true
+                }
+                if(isBlank(valuesarr)) { 
+                    return true;
+                }
+                return false;
+            }) 
+        } 
         if(!isBlank(r1)) {
             result.innerHTML=r1.join("\n") 
         } 
@@ -136,34 +172,46 @@ window.onload=function(){
     wlenGlobal.addEventListener("input",function() { 
         var num=parseInt(wlenGlobal.value)  
         if(!isNaN(num)) {  
-            if(num != prevnum) {
-                for(var i=0;i < prevnum;i++) {
+            if(num != prevnum) { 
+                for(var i=0;i < prevnum*2;i++) { 
                     var oldinput=document.getElementById(previnputarray[i]) 
                     oldinput.remove();
                 } 
                 var idpos=0
                 prevnum=num  
-                var inputIdArray=[]
-                for(var i=0;i < num;i++) {
-                    var newinput=document.createElement("input") 
-                    newinput.id="letterinpos" + idpos 
-                    newinput.placeholder="letter is in pos " +idpos
-                    idpos++
-                    inputIdArray.push(newinput.id) 
-                    inputs.appendChild(newinput)
+                var inputIdArray=[] 
+                for(var i=0;i < num *2;i++) { 
+                    if(i < num) {
+                        var newinput=document.createElement("input") 
+                        newinput.id="letterinpos" + idpos 
+                        newinput.placeholder="letter is in pos " +idpos
+                        idpos++
+                        inputIdArray.push(newinput.id) 
+                        inputs.appendChild(newinput) 
+                    } 
+                    else { 
+                        var newinput=document.createElement("input") 
+                        newinput.id="letterNotinpos" + (idpos-num) 
+                        newinput.placeholder="letter is not in pos " +(idpos-num)
+                        idpos++
+                        inputIdArray.push(newinput.id) 
+                        inputs.appendChild(newinput) 
+                    }
                 }  
                 previnputarray=inputIdArray; 
-                globalAddedInputs=inputIdArray
+                globalAddedInputs=inputIdArray.slice(0,num) 
+                globalNotInputs=inputIdArray.slice(num,inputIdArray.length)
             }
         } 
         else { 
-            for(var i=0;i < prevnum;i++) {
+            for(var i=0;i < prevnum*2;i++) {
                 var oldinput=document.getElementById(previnputarray[i]) 
                 oldinput.remove();
             } 
             prevnum=0; 
             previnputarray =[]  
             globalAddedInputs=[]
+            globalNotInputs=[]
         }
     })
 }
